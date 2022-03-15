@@ -21,7 +21,7 @@ def parse_args():
 
 def get_dls(train, val, batch_size=32, num_workers=4):
     return [
-        DataLoader(getattr(data, s.TYPE)(**s.CFG, transform=transforms.ToTensor()),
+        DataLoader(getattr(data, s.TYPE)(**s.CFG),
                    batch_size=batch_size,
                    num_workers=num_workers,
                    shuffle=s is train)

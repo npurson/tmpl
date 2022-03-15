@@ -18,6 +18,7 @@ class PLModelInterface(pl.LightningModule):
                  **kwargs):
         super().__init__()
 
+        # Convert str into ConfigDict
         model, criterion, optimizer, scheduler = map(
             lambda t: ConfigDict(type=t, cfg={}) if isinstance(t, str) else t,
             (model, criterion, optimizer, scheduler))
@@ -33,27 +34,29 @@ class PLModelInterface(pl.LightningModule):
     def forward(self, x):
         return self.model(x)
 
-    def _step(self, batch, batch_idx):
+    def _step(self, batch, batch_idx, evaluate=False):
         x, y = batch
         pred = self(x)
         loss = self.criterion(pred, y)
+        if evaluate:
+            return loss, self.evaluate(pred, y)
         return loss
 
     def training_step(self, batch, batch_idx):
-        loss = self._step(batch, batch_idx)
+        loss, acc = self._step(batch, batch_idx, evaluate=True)
         self.log('train_loss', loss)
+        self.log('train_acc', acc, on_epoch=True)
         return loss
 
     def validation_step(self, batch, batch_idx):
-        loss = self._step(batch, batch_idx)
+        loss, acc = self._step(batch, batch_idx, evaluate=True)
         self.log('val_loss', loss)
-
-        # self.log('val_loss', loss, on_step=False, on_epoch=True, prog_bar=True)
-        # self.log('val_acc', correct_num/len(out_digit), on_step=False, on_epoch=True, prog_bar=True)
+        self.log('val_acc', acc, prog_bar=True)
 
     def test_step(self, batch, batch_idx):
-        loss = self._step(batch, batch_idx)
+        loss, acc = self._step(batch, batch_idx, evaluate=True)
         self.log('test_loss', loss)
+        self.log('test_acc', acc, prog_bar=True)
 
     def configure_optimizers(self):
         optimizer = self.optimizer(self.parameters(), **self.optimizer_cfg)
