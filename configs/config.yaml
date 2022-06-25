@@ -14,15 +14,12 @@ DATA:
   BATCH_SIZE: 32
   NUM_WORKERS: 4
 
-MODEL:
+SOLVER:
   MODEL:
     TYPE: resnet18
     CFG:
       num_classes: 10
-  # LOSS: CrossEntropyLoss
-
-SOLVER:
-  NUM_EPOCHS: 40
+  CRITERION: CrossEntropyLoss
   OPTIMIZER:
     TYPE: AdamW
     CFG:
@@ -32,3 +29,9 @@ SOLVER:
     TYPE: CosineAnnealingLR
     CFG:
       T_max: 10
+
+TRAINER:
+  MAX_EPOCHS: 12
+  PRECISION: 16
+  GPUS: 2
+  STRATEGY: ddp
