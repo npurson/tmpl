@@ -16,6 +16,7 @@ class ImgTxtPairsDataset(data.Dataset):
         │   └─labels
         └─test
     """
+
     def __init__(self, data_root, mode='train'):
         assert mode in ('train', 'val', 'test')
         data_root = osp.join(data_root, mode)
@@ -33,17 +34,14 @@ class ImgTxtPairsDataset(data.Dataset):
 
         self.data = []
         for img_path in os.listdir(image_root):
-            lbl_path = osp.join(data_root, 'labels',
-                                img_path.replace('.jpg', '.txt'))
+            lbl_path = osp.join(data_root, 'labels', img_path.replace('.jpg', '.txt'))
             if osp.exists(lbl_path):
                 with open(lbl_path) as f:
-                    label = [int(line[0]) for line in f.readlines()
-                             if line[0] != ' ']
+                    label = [int(line[0]) for line in f.readlines() if line[0] != ' ']
                 self.data.append([
                     osp.join(image_root, img_path),
                     # [1 if c in label else 0 for c in range(num_classes)]
-                    sum([1 * (c + 1) if c in label else 0
-                         for c in range(num_classes)])
+                    sum([1 * (c + 1) if c in label else 0 for c in range(num_classes)])
                 ])
                 for c in range(num_classes):
                     cls_cnt[c][1 if c in label else 0] += 1

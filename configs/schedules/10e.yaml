@@ -1,0 +1,17 @@
+# @package _global_
+
+solver:
+  optimizer:
+    type: AdamW
+    cfgs:
+      lr: 1.0e-3
+      weight_decay: 1.0e-5
+  scheduler:
+    type: CosineAnnealingLR
+    cfgs:
+      T_max: 10
+
+trainer:
+  max_epochs: 10
+  # max_steps: 1000
+  # gradient_clip_val: 0

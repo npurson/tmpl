@@ -18,6 +18,7 @@ class ImgDirsDataset(data.Dataset):
         ├─val
         └─test
     """
+
     def __init__(self, data_root, mode='train'):
         assert mode in ('train', 'val', 'test')
         data_root = osp.join(data_root, mode)
@@ -51,4 +52,3 @@ class ImgDirsDataset(data.Dataset):
 
 if __name__ == '__main__':
     data = ImgDirsDataset('...')
-    import pdb; pdb.set_trace()

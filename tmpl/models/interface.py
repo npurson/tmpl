@@ -2,36 +2,19 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.distributed as dist
-import pytorch_lightning as pl
-from typing import Union
+import lightning.pytorch as pl
 
-import model as model_zoo
-from utils import evaluation
-from utils.config import ConfigDict
+from .. import models
 
 
 class PLModelInterface(pl.LightningModule):
-    def __init__(self,
-                 model: Union[str, ConfigDict],
-                 criterion: Union[str, ConfigDict] = 'CrossEntropyLoss',
-                 optimizer: Union[str, ConfigDict] = 'AdamW',
-                 scheduler: Union[str, ConfigDict] = 'CosineAnnealingLR',
-                 evaluator: str = 'accuracy',
-                 **kwargs):
+
+    def __init__(self, model, criterion, optimizer, scheduler, **kwargs):
         super().__init__()
-
-        # Convert str into ConfigDict
-        model, criterion, optimizer, scheduler = map(
-            lambda t: ConfigDict(type=t, cfg={}) if isinstance(t, str) else t,
-            (model, criterion, optimizer, scheduler))
-
-        self.model = getattr(model_zoo, model.type)(**model.cfg)
-        self.criterion = getattr(nn, criterion.type)(**criterion.cfg)
-        self.optimizer = getattr(optim, optimizer.type)
-        self.optimizer_cfg = optimizer.cfg
-        self.scheduler = getattr(optim.lr_scheduler, scheduler.type)
-        self.scheduler_cfg = scheduler.cfg
-        self.evaluate = getattr(evaluation, evaluator)
+        self.model = getattr(models, model.type)(**model.cfgs)
+        self.criterion = getattr(nn, criterion.type)()
+        self.optimizer = optimizer
+        self.scheduler = scheduler
 
     def forward(self, x):
         return self.model(x)
@@ -54,6 +37,9 @@ class PLModelInterface(pl.LightningModule):
 
     def validation_step(self, batch, batch_idx):
         loss, pred, y = self._step(batch, return_pred=True)
+        # When you call self.log inside the validation_step and test_step,
+        # Lightning automatically accumulates the metric and averages it
+        # once it’s gone through the whole split (epoch).
         self.log('val_loss', loss)
         self.log('val_acc', self.evaluate(pred, y), prog_bar=True)
         return pred.argmax(dim=1), y
@@ -64,10 +50,12 @@ class PLModelInterface(pl.LightningModule):
 
         preds_list = [
             torch.zeros(preds.shape, dtype=preds.dtype, device=preds.device)
-            for _ in range(dist.get_world_size())]
+            for _ in range(dist.get_world_size())
+        ]
         targets_list = [
             torch.zeros(targets.shape, dtype=targets.dtype, device=targets.device)
-            for _ in range(dist.get_world_size())]
+            for _ in range(dist.get_world_size())
+        ]
         dist.all_gather(preds_list, preds)
         dist.all_gather(targets_list, targets)
 
@@ -82,6 +70,7 @@ class PLModelInterface(pl.LightningModule):
         self.log('test_acc', acc, prog_bar=True)
 
     def configure_optimizers(self):
-        optimizer = self.optimizer(self.parameters(), **self.optimizer_cfg)
-        scheduler = self.scheduler(optimizer, **self.scheduler_cfg)
+        optimizer = getattr(optim, self.optimizer.type)(self.parameters(), **self.optimizer.cfgs)
+        scheduler = getattr(optim.lr_scheduler, self.scheduler.type)(optimizer,
+                                                                     **self.scheduler.cfgs)
         return {'optimizer': optimizer, 'lr_scheduler': scheduler}

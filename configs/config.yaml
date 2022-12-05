@@ -1,37 +1,23 @@
-DATA:
-  TRAIN:
-    TYPE: CIFAR10
-    CFG:
-      root: datasets/cifar
-      train: True
-      download: True
-  VAL:
-    TYPE: CIFAR10
-    CFG:
-      root: datasets/cifar
-      train: False
-      download: True
-  BATCH_SIZE: 32
-  NUM_WORKERS: 4
+# Refer to
+# - https://hydra.cc/docs/tutorials/basic/your_first_app/defaults/
+# - https://hydra.cc/docs/patterns/configuring_experiments/
+# for more information about config group defaults
+defaults:
+  - datasets: cifar10
+  - models: resnet18.yaml
+  - schedules: 10e
 
-SOLVER:
-  MODEL:
-    TYPE: resnet18
-    CFG:
-      num_classes: 10
-  CRITERION: CrossEntropyLoss
-  OPTIMIZER:
-    TYPE: AdamW
-    CFG:
-      lr: 1.0e-3  # '.0' is required for PyYAML to match with float instead of str
-      weight_decay: 1.0e-5
-  SCHEDULER:
-    TYPE: CosineAnnealingLR
-    CFG:
-      T_max: 10
+trainer:
+  # num_nodes: 1
+  devices: 4
+  accelerator: gpu
+  strategy: ddp  # bagua
+  precision: 16
 
-TRAINER:
-  MAX_EPOCHS: 12
-  PRECISION: 16
-  GPUS: 2
-  STRATEGY: ddp
+  # callbacks:
+  #   EarlyStopping(monitor="val_accuracy", min_delta=0.00, patience=3, verbose=False, mode="max")
+
+  # check_val_every_n_epoch: 1
+  # limit_train_batches: 10  # shorten the epoch length for debugging
+  # limit_val_batches: 5
+  # profiler: simple  # advanced, profiling measures the time consuming of all components
