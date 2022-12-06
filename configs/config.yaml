@@ -6,18 +6,36 @@ defaults:
   - datasets: cifar10
   - models: resnet18.yaml
   - schedules: 10e
+  - _self_
+  - override hydra/hydra_logging: none  # disable hydra logging
+  - override hydra/job_logging: none
+
+hydra:  # disable file output of hydra
+  run:
+    dir: .
+  output_subdir: null
 
 trainer:
   # num_nodes: 1
   devices: 4
   accelerator: gpu
-  strategy: ddp  # bagua
+  strategy: ddp_find_unused_parameters_false  # ddp, bagua  # ddp_find_unused_parameters_false is experimental and subject to change
+  sync_batchnorm: True
   precision: 16
 
-  # callbacks:
-  #   EarlyStopping(monitor="val_accuracy", min_delta=0.00, patience=3, verbose=False, mode="max")
+  # [OPTINAL]
+  # The following are some flags may be useful for your further development.
+  # Refer to https://pytorch-lightning.readthedocs.io/en/latest/common/trainer.html for more infomation.
 
+  # enable_checkpointing: True
   # check_val_every_n_epoch: 1
-  # limit_train_batches: 10  # shorten the epoch length for debugging
-  # limit_val_batches: 5
-  # profiler: simple  # advanced, profiling measures the time consuming of all components
+  # accumulate_grad_batches: 1
+  # log_every_n_steps: 50
+  # enable_progress_bar: False
+  # profiler: simple  # profiling measures the time consuming of all components
+
+  # TODO: Build the callbacks before passed to trainer.__init__().
+  # callbacks:
+  #   LearningRateMonitor(logging_interval='step')
+  #   ModelCheckpoint(dirpath='my/path/', filename='{epoch}-{val_loss:.2f}-{other_metric:.2f}')
+  #   ModelSummary(max_depth=-1)

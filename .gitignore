@@ -128,5 +128,5 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-datasets/
-lightning_logs/
+/datasets
+/lightning_logs

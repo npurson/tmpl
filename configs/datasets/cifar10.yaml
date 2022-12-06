@@ -1,0 +1,27 @@
+# @package _global_
+
+data:
+  datasets:
+    type: CIFAR10
+    splits:
+      train:
+        root: datasets/cifar-10
+        train: True
+        # download: True
+      test:
+        root: datasets/cifar-10
+        train: False
+        download: True
+  loader:
+    batch_size: 32  # batch size per GPU
+    num_workers: 4
+
+solver:
+  model:
+    cfgs:
+      num_classes: 10
+  evaluator:
+    type: Accuracy
+    cfgs:
+      task: multiclass
+      num_classes: 10

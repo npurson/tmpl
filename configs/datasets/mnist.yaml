@@ -1,0 +1,27 @@
+# @package _global_
+
+data:
+  datasets:
+    type: MNIST
+    splits:
+      train:
+        root: datasets/mnist
+        train: True
+        # download: True
+      test:
+        root: datasets/mnist
+        train: False
+        download: True
+  loader:
+    batch_size: 32
+    num_workers: 4
+
+solver:
+  model:
+    cfgs:
+      num_classes: 10
+  evaluator:
+    type: Accuracy
+    cfgs:
+      task: multiclass
+      num_classes: 10

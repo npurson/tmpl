@@ -14,4 +14,4 @@ solver:
 trainer:
   max_epochs: 10
   # max_steps: 1000
-  # gradient_clip_val: 0
+  # gradient_clip_val: 1.0

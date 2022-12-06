@@ -1,0 +1,27 @@
+# @package _global_
+
+data:
+  datasets:
+    type: CIFAR100
+    splits:
+      train:
+        root: datasets/cifar-100
+        train: True
+        # download: True
+      test:
+        root: datasets/cifar-100
+        train: False
+        download: True
+  loader:
+    batch_size: 32
+    num_workers: 4
+
+solver:
+  model:
+    cfgs:
+      num_classes: 100
+  evaluator:
+    type: Accuracy
+    cfgs:
+      task: multiclass
+      num_classes: 100
