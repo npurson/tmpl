@@ -7,7 +7,7 @@ data:
       train:
         root: datasets/cifar-100
         train: True
-        # download: True
+        download: True
       test:
         root: datasets/cifar-100
         train: False

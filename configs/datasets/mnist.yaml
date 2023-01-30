@@ -7,7 +7,7 @@ data:
       train:
         root: datasets/mnist
         train: True
-        # download: True
+        download: True
       test:
         root: datasets/mnist
         train: False

@@ -7,19 +7,24 @@ defaults:
   - models: resnet18.yaml
   - schedules: 10e
   - _self_
-  - override hydra/hydra_logging: none  # disable hydra logging
-  - override hydra/job_logging: none
+  # - override hydra/hydra_logging: none  # disable hydra logging
+  # - override hydra/job_logging: none
 
-hydra:  # disable file output of hydra
-  run:
-    dir: .
-  output_subdir: null
+# hydra:  # disable file output of hydra
+#   run:
+#     dir: .
+#   output_subdir: null
+
+hydra:
+  mode: MULTIRUN  # otherwise the DDP output files may be in a mess, see https://github.com/Lightning-AI/lightning/pull/11617
+  sweep:
+    dir: outputs/multirun/${now:%Y-%m-%d}/${now:%H-%M-%S}
 
 trainer:
   # num_nodes: 1
   devices: 4
   accelerator: gpu
-  strategy: ddp_find_unused_parameters_false  # ddp, bagua  # ddp_find_unused_parameters_false is experimental and subject to change
+  strategy: ddp  # ddp_find_unused_parameters_false is experimental and subject to change
   sync_batchnorm: True
   precision: 16
 

@@ -28,7 +28,6 @@ A template for rapid & flexible DL experimentation development, built upon [Ligh
 * Bumped to the latest Lightning v1.8
 * Adopts Hydra for configuring
 * ***Next:***
-    * Applies [Loguru](https://github.com/Delgan/loguru) for logging
     * Building from config for useful callbacks
 
 ## Installation
@@ -44,14 +43,14 @@ pip install -r requirements.txt
 1. **Training**
 
     ```shell
-    python tools/train.py [--config-name config[.yaml]] [trainer.devices=2] [datasets=cifar100] [data.loader.batch_size=16]
+    python tools/train.py [--config-name config[.yaml]] [datasets=cifar100] [trainer.devices=4] [data.loader.batch_size=16]
     ```
 
     * Override the default config file with `--config-name`.
-    * You can also override any value in the loaded config from the command line, here are some common cases.
-    * Refer to the following for more infomation.
+    * You can also override any value in the loaded config from the command line, refer to the following for more infomation.
         * https://hydra.cc/docs/tutorials/basic/your_first_app/config_file/
         * https://hydra.cc/docs/advanced/hydra-command-line-flags/
+        * https://hydra.cc/docs/advanced/override_grammar/basic/
 
 2. **Tips for Further Development**
 
