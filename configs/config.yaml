@@ -4,7 +4,7 @@
 # for more information about config group defaults
 defaults:
   - datasets: cifar10
-  - models: resnet18.yaml
+  - models: resnet50
   - schedules: 10e
   - _self_
   # - override hydra/hydra_logging: none  # disable hydra logging

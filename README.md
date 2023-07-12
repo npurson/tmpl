@@ -6,13 +6,13 @@
 
 ![](https://img.shields.io/badge/Python-3.7%20%7C%203.8%20%7C%203.9%20%7C%203.10-blue)
 ![](https://img.shields.io/badge/PyTorch-1.8%2B-red)
-![](https://img.shields.io/badge/Lightning-1.8-blue)
-![](https://img.shields.io/badge/Hydra-1.2-lightgrey)
+![](https://img.shields.io/badge/Lightning-2.0-blue)
+![](https://img.shields.io/badge/Hydra-1.3-lightgrey)
 
 [![](https://img.shields.io/github/license/npurson/tmpl)](LICENSE)
-![](https://img.shields.io/badge/version-v1.0-blue)
+![](https://img.shields.io/badge/version-v2.0rc0-blue)
 
-[Docs](https://pytorch-lightning.readthedocs.io/en/stable/) &nbsp;•&nbsp;
+[Docs](https://lightning.ai/docs/pytorch/stable/) &nbsp;•&nbsp;
 [Installation](#installation) &nbsp;•&nbsp;
 [Usage](#usage) &nbsp;•&nbsp;
 [Reference](#reference) &nbsp;•&nbsp;
@@ -23,12 +23,10 @@ A template for rapid & flexible DL experimentation development, built upon [Ligh
 
 ## What's New
 
-***v1.0*** was released in 2022-12-06:
+***v2.0rc0*** released on Jul 12th, 2023:
 
-* Bumped to the latest Lightning v1.8
-* Adopts Hydra for configuring
-* ***Next:***
-    * Building from config for useful callbacks
+* Upgraded to the latest Lightning v2.0+
+    * NOTE: Compatibility issues may be introduced due to the changes in Lightning APIs, switch back to [v1.8](https://github.com/npurson/tmpl/tree/v1.8) if needed.
 
 ## Installation
 

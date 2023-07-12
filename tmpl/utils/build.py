@@ -1,3 +1,4 @@
+import os
 import lightning.pytorch as pl
 from omegaconf import DictConfig, open_dict
 
@@ -11,7 +12,6 @@ def build_from_configs(cfg: DictConfig):
         cfg.trainer.strategy = None
     with open_dict(cfg):
         cfg.trainer.enable_progress_bar = False
-    # TODO: pass config_name and specify the save_dir
 
     output_dir = 'outputs'
     callbacks = {
@@ -22,12 +22,13 @@ def build_from_configs(cfg: DictConfig):
         'callbacks': [
             pl.callbacks.LearningRateMonitor(logging_interval='step'),
             pl.callbacks.ModelCheckpoint(
-                dirpath=output_dir,
-                filename="{epoch}-{val_acc:.4f}",
+                dirpath=os.path.join(output_dir, cfg.save_dir)
+                if cfg.get('save_dir') else output_dir,
+                filename='e{epoch}_acc{val_acc:.4f}',
                 monitor='val_acc',
                 save_last=True,
                 mode='max',
-            )
+                auto_insert_metric_name=False)
         ]
     }
     return cfg, callbacks

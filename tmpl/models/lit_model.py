@@ -1,12 +1,12 @@
 import torch.nn as nn
 import torch.optim as optim
-import lightning.pytorch as pl
+import lightning as L
 
 from .. import models
 from .. import evaluation
 
 
-class PLModelInterface(pl.LightningModule):
+class LitModel(L.LightningModule):
 
     def __init__(self, model, criterion, optimizer, scheduler, evaluator, **kwargs):
         super().__init__()
@@ -30,7 +30,7 @@ class PLModelInterface(pl.LightningModule):
 
     def training_step(self, batch, batch_idx):
         loss = self._step(batch, self.train_evaluator)
-        self.log('train_loss', loss)
+        self.log('train_loss', loss, prog_bar=True, on_step=True)
         # Refer to https://torchmetrics.readthedocs.io/en/stable/pages/lightning.html#logging-torchmetrics
         self.log('train_acc', self.train_evaluator, on_epoch=True)
         return loss

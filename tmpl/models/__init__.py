@@ -1,2 +1,2 @@
 from torchvision.models import *
-from .interface import PLModelInterface
+from .lit_model import LitModel

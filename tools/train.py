@@ -4,10 +4,10 @@ sys.path.append('.')  # run from project root
 
 import os
 import hydra
-import lightning.pytorch as pl
+import lightning as L
 from omegaconf import DictConfig, OmegaConf
 
-from tmpl import build_data_loaders, PLModelInterface, build_from_configs
+from tmpl import LitModel, build_data_loaders, build_from_configs
 
 
 @hydra.main(version_base=None, config_path='../configs', config_name='config')
@@ -17,8 +17,8 @@ def main(cfg: DictConfig):
     cfg, callbacks = build_from_configs(cfg)
 
     dls = build_data_loaders(cfg.data)
-    model = PLModelInterface(**cfg.solver)
-    trainer = pl.Trainer(**cfg.trainer, **callbacks)
+    model = LitModel(**cfg.solver)
+    trainer = L.Trainer(**cfg.trainer, **callbacks)
     trainer.fit(model, *dls)  # resume training by `ckpt_path='/path/to/checkpoint.ckpt'`
 
 
