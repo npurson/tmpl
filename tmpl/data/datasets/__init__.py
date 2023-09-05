@@ -1,3 +1,4 @@
 from torchvision.datasets import *
-from .img_dirs import ImgDirsDataset
-from .img_txt_pairs import ImgTxtPairsDataset
+
+from .image_folder import ImageFolderDataset
+from .image_text_pairs import ImageTextPairsDataset

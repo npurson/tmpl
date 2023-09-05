@@ -1,12 +1,13 @@
 import os
 import os.path as osp
+
 import torch
 import torch.utils.data as data
 import torchvision.transforms as T
 from PIL import Image
 
 
-class ImgDirsDataset(data.Dataset):
+class ImageFolderDataset(data.Dataset):
     """
     The root directory should be structured as follows:
 
@@ -23,7 +24,7 @@ class ImgDirsDataset(data.Dataset):
         assert mode in ('train', 'val', 'test')
         data_root = osp.join(data_root, mode)
         self.mode = mode
-        self.CLASSES = tuple(os.listdir(data_root))
+        self.classes = tuple(os.listdir(data_root))
 
         self.transforms = T.Compose([
             T.Resize((448, 448)),
@@ -33,22 +34,20 @@ class ImgDirsDataset(data.Dataset):
         ])
 
         self.data = []
-        total_prev = 0
-        for i, c in enumerate(self.CLASSES):
-            for img in os.listdir(osp.join(data_root, c)):
-                self.data.append((osp.join(data_root, c, img), i))
-            print(f'{c}: {len(self.data) - total_prev}')
-            total_prev = len(self.data)
+        for i, cls in enumerate(self.classes):
+            cls_dir = osp.join(data_root, cls)
+            for img in os.listdir(cls_dir):
+                self.data.append((osp.join(cls_dir, img), i))
+            print(f'{cls}: {os.listdir(cls_dir)}')
 
     def __len__(self):
         return len(self.data)
 
     def __getitem__(self, idx):
         img_path, label = self.data[idx]
-        img = self.transforms(Image.open(img_path))
+        img = Image.open(img_path)
+        if img.mode != 'RGB':
+            img = img.convert('RGB')
+        img = self.transforms(img)
         label = torch.tensor(label, dtype=torch.long)
         return img, label
-
-
-if __name__ == '__main__':
-    data = ImgDirsDataset('...')

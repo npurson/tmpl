@@ -1,7 +1,6 @@
 # @package _global_
 
-solver:
-  model:
-    type: resnet50
-  criterion:
-    type: CrossEntropyLoss
+model:
+  type: resnet50
+criterion:
+  type: CrossEntropyLoss
