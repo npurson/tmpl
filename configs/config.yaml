@@ -7,18 +7,11 @@ defaults:
   - models: resnet50
   - schedules: 10e
   - _self_
-  # - override hydra/hydra_logging: none  # disable hydra logging
-  # - override hydra/job_logging: none
-
-# hydra:  # disable file output of hydra
-#   run:
-#     dir: .
-#   output_subdir: null
 
 hydra:
   mode: MULTIRUN  # refer to https://github.com/Lightning-AI/lightning/pull/11617
   sweep:
-    dir: outputs/multirun/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    dir: outputs/${now:%Y-%m-%d}/${now:%H-%M}
 
 trainer:
   # num_nodes: 1
@@ -26,7 +19,7 @@ trainer:
   accelerator: gpu
   strategy: ddp
   sync_batchnorm: True
-  precision: 16
+  precision: 16-mixed
 
   # Refer to https://lightning.ai/docs/pytorch/latest/common/trainer.html for more infomation.
   # check_val_every_n_epoch: 1

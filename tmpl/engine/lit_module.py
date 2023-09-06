@@ -7,7 +7,7 @@ from .. import build_from_configs, evaluation, models
 
 class LitModule(L.LightningModule):
 
-    def __init__(self, *, model, optimizer, scheduler, criterion=None, evaluator=None):
+    def __init__(self, *, model, optimizer, scheduler, criterion=None, evaluator=None, **kwargs):
         super().__init__()
         self.model = build_from_configs(models, model)
         self.optimizer = optimizer
@@ -29,8 +29,9 @@ class LitModule(L.LightningModule):
 
     def training_step(self, batch, batch_idx):
         loss = self._step(batch, self.train_evaluator)
-        self.log('train_loss', loss)
-        self.log('train_acc', self.train_evaluator, on_epoch=True)
+        self.log('train/loss', loss)
+        if self.train_evaluator:
+            self.log('train/acc', self.train_evaluator, on_epoch=True)
         return loss
 
     def validation_step(self, batch, batch_idx):
@@ -43,8 +44,9 @@ class LitModule(L.LightningModule):
         loss = self._step(batch, self.test_evaluator)
         # Lightning automatically accumulates the metric and averages it
         # if `self.log` is inside the `validation_step` and `test_step`
-        self.log(f'{prefix}_loss', loss, sync_dist=True)
-        self.log(f'{prefix}_acc', self.test_evaluator, sync_dist=True)
+        self.log(f'{prefix}/loss', loss, sync_dist=True)
+        if self.test_evaluator:
+            self.log(f'{prefix}/acc', self.test_evaluator, sync_dist=True)
 
     def configure_optimizers(self):
         optimizer = build_from_configs(optim, self.optimizer, params=self.model.parameters())

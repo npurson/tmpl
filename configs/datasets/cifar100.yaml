@@ -16,6 +16,7 @@ data:
 
 model:
   num_classes: 100
+
 evaluator:
   type: Accuracy
   task: multiclass

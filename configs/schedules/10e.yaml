@@ -4,6 +4,7 @@ optimizer:
   type: AdamW
   lr: 1.0e-3
   weight_decay: 1.0e-5
+
 scheduler:
   type: CosineAnnealingLR
   T_max: 10

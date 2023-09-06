@@ -2,5 +2,6 @@
 
 model:
   type: resnet18
+
 criterion:
   type: CrossEntropyLoss

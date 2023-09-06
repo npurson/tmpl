@@ -13,7 +13,7 @@ def main(cfg: DictConfig):
         print(OmegaConf.to_yaml(cfg))
     cfg, callbacks = pre_build_callbacks(cfg)
 
-    dls, meta_info = build_data_loaders(cfg.data)
+    dls = build_data_loaders(cfg.data)
     model = LitModule(**cfg)
     trainer = L.Trainer(**cfg.trainer, **callbacks)
     trainer.fit(model, *dls)
