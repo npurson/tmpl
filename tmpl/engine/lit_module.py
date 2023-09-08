@@ -12,7 +12,7 @@ class LitModule(L.LightningModule):
         self.model = build_from_configs(models, model)
         self.optimizer = optimizer
         self.scheduler = scheduler
-        self.criterion = build_from_configs(nn, criterion)
+        self.criterion = build_from_configs(nn, criterion) if criterion else self.model.loss
         self.train_evaluator = build_from_configs(evaluation, evaluator)
         self.test_evaluator = build_from_configs(evaluation, evaluator)
 
@@ -22,7 +22,7 @@ class LitModule(L.LightningModule):
     def _step(self, batch, evaluator=None):
         x, y = batch
         pred = self(x)
-        loss = self.criterion(pred, y) if self.criterion is not None else self.model.loss(pred, y)
+        loss = self.criterion(pred, y)
         if evaluator:
             evaluator.update(pred, y)
         return loss
