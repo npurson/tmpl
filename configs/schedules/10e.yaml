@@ -3,7 +3,7 @@
 optimizer:
   type: AdamW
   lr: 1.0e-3
-  weight_decay: 1.0e-5
+  weight_decay: 1.0e-4
 
 scheduler:
   type: CosineAnnealingLR

@@ -11,7 +11,7 @@ data:
     root: data/cifar-10
     download: True
   loader:
-    batch_size: 32  # batch size per GPU
+    batch_size: 32
     num_workers: 4
 
 model:

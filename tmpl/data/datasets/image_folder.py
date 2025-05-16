@@ -23,9 +23,7 @@ class ImageFolderDataset(data.Dataset):
     def __init__(self, data_root, mode='train'):
         assert mode in ('train', 'val', 'test')
         data_root = osp.join(data_root, mode)
-        self.mode = mode
         self.classes = tuple(os.listdir(data_root))
-
         self.transforms = T.Compose([
             T.Resize((448, 448)),
             T.RandomHorizontalFlip(),
@@ -38,7 +36,7 @@ class ImageFolderDataset(data.Dataset):
             cls_dir = osp.join(data_root, cls)
             for img in os.listdir(cls_dir):
                 self.data.append((osp.join(cls_dir, img), i))
-            print(f'{cls}: {os.listdir(cls_dir)}')
+            print(f'{cls}: {len(os.listdir(cls_dir))}')
 
     def __len__(self):
         return len(self.data)

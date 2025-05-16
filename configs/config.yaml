@@ -1,7 +1,6 @@
 # Refer to Hydra documentation for more information about config group defaults.
 # - https://hydra.cc/docs/tutorials/basic/your_first_app/defaults/
 # - https://hydra.cc/docs/patterns/configuring_experiments/
-
 defaults:
   - datasets: cifar10
   - models: resnet50
@@ -9,24 +8,12 @@ defaults:
   - _self_
 
 hydra:
-  mode: MULTIRUN  # refer to https://github.com/Lightning-AI/lightning/pull/11617
-  sweep:
-    dir: outputs/${now:%Y-%m-%d}/${now:%H-%M}
+  run:
+    dir: outputs/${now:%Y%m%d-%H%M%S}
 
-trainer:
-  # num_nodes: 1
+trainer:  # refer to https://lightning.ai/docs/pytorch/stable/common/trainer.html
   devices: 4
-  accelerator: gpu
-  strategy: ddp
-  sync_batchnorm: True
   precision: 16-mixed
-
-  # Refer to https://lightning.ai/docs/pytorch/latest/common/trainer.html for more infomation.
-  # check_val_every_n_epoch: 1
-  # log_every_n_steps: 50
-  # enable_progress_bar: False
-  # profiler: simple  # profiling measures the time consuming of all components
-
-  # TODO: Build callbacks before passed to trainer.__init__().
-  # callbacks:
-  #   GradientAccumulationScheduler(scheduling={4: 2})
+  sync_batchnorm: True
+  # enable_progress_bar: False  # will log to console and save to file (customized in build_callbacks())
+  # profiler: simple

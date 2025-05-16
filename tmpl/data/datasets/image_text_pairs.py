@@ -22,9 +22,6 @@ class ImageTextPairsDataset(data.Dataset):
         assert mode in ('train', 'val', 'test')
         data_root = osp.join(data_root, mode)
         image_root = osp.join(data_root, 'images')
-        self.mode = mode
-        cls_cnts = [[0 for _ in range(num_classes)] for _ in range(num_classes)]
-
         self.transforms = T.Compose([
             T.Resize((448, 448)),
             T.RandomHorizontalFlip(),
@@ -42,10 +39,7 @@ class ImageTextPairsDataset(data.Dataset):
                     osp.join(image_root, img_path),
                     sum([1 * (c + 1) if c in label else 0 for c in range(num_classes)])
                 ])
-                for c in range(num_classes):
-                    cls_cnts[c][1 if c in label else 0] += 1
-        print(f'[data] Loaded {len(self.data)} images in {mode} split.')
-        print(cls_cnts)
+        print(f'Loaded {len(self.data)} images in the {mode} split.')
 
     def __len__(self):
         return len(self.data)

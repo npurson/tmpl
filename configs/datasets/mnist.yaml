@@ -5,10 +5,10 @@ data:
     type: MNIST
     splits:
       train:
-        download: True
+        train: True
       test:
         train: False
-    root: datasets/mnist
+    root: data/mnist
     download: True
   loader:
     batch_size: 32

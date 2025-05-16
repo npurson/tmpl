@@ -1,35 +1,30 @@
+from hydra.core.hydra_config import HydraConfig
 from lightning.pytorch import callbacks, loggers
 from omegaconf import DictConfig, OmegaConf
 
-from .tabular_logger import TabularLogger
+from .console_logger import ConsoleLogger
 
 
-def pre_build_callbacks(cfg: DictConfig):
-    if cfg.trainer.devices == 1 and cfg.trainer.get('strategy'):
-        cfg.trainer.strategy = 'auto'
-
-    output_dir = 'outputs'
-
-    logger = [loggers.TensorBoardLogger(save_dir=output_dir, name=None)]
+def build_callbacks(cfg: DictConfig):
+    output_dir = HydraConfig.get().runtime.output_dir
+    logger = [loggers.TensorBoardLogger(save_dir=output_dir, name=None, version='')]
     callback = [
         callbacks.LearningRateMonitor(logging_interval='step'),
         callbacks.ModelCheckpoint(
-            dirpath=logger[0].log_dir,
-            filename='e{epoch}_acc{val_acc:.4f}',
+            dirpath=output_dir,
+            filename='e{epoch}_acc{val/acc:.4f}',
             monitor='val/acc',
-            save_last=True,
             mode='max',
+            save_last=True,
             auto_insert_metric_name=False),
-        callbacks.RichModelSummary(max_depth=1)
+        callbacks.RichModelSummary(max_depth=2)
     ]
 
     if cfg.trainer.get('enable_progress_bar', True):
         callback.append(callbacks.RichProgressBar())
     else:
-        logger.append(
-            TabularLogger(save_dir=output_dir, name=None, version=logger[0].version))
-
-    return cfg, dict(logger=logger, callbacks=callback)
+        logger.append(ConsoleLogger(save_dir=output_dir, name=None, version=''))
+    return dict(logger=logger, callbacks=callback)
 
 
 def build_from_configs(obj, cfg: DictConfig, **kwargs):

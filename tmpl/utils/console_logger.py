@@ -10,20 +10,10 @@ log = logging.getLogger(__name__)
 
 
 class ConsoleExperimentWriter(ExperimentWriter):
-    r"""
-    Experiment writer for CSVLogger.
 
-    Currently supports to log hyperparameters and metrics in YAML and CSV
-    format, respectively.
-
-    Args:
-        log_dir: Directory for the experiment logs
-    """
-
-    NAME_METRICS_FILE = 'log.txt'
-
-    def log_metrics(self, metrics_dict: Dict[str, float], step: Optional[int] = None) -> None:
-        """Record metrics."""
+    def log_metrics(self,
+                    metrics_dict: Dict[str, float],
+                    step: Optional[int] = None) -> None:
         super().log_metrics(metrics_dict, step)
         metrics = self.metrics[-1]
 
@@ -31,21 +21,18 @@ class ConsoleExperimentWriter(ExperimentWriter):
             return ', '.join([
                 f'{x}: {{{metrics2str(y)}}}' if isinstance(y, dict) else
                 (f'{x}: {y:.4f}' if y >= 1e-4 else f'{x}: {y:.5f}')
-                if isinstance(y, float) else f'{x}: {y}' for x, y in metrics.items()
+                if isinstance(y, float) else f'{x}: {y}'
+                for x, y in metrics.items()
             ])
 
         log_str = metrics2str(metrics)
-        with open(self.metrics_file_path, 'a+') as f:
-            f.write(log_str + '\n')
-        log.info(log_str)
+        log.info(log_str)  # will be saved to file by Hydra
 
     def save(self) -> None:
-        """Save recorded hparams and metrics into files."""
-        hparams_file = os.path.join(self.log_dir, self.NAME_HPARAMS_FILE)
-        save_hparams_to_yaml(hparams_file, self.hparams)
+        return
 
 
-class TabularLogger(CSVLogger):
+class ConsoleLogger(CSVLogger):
 
     @property
     @rank_zero_experiment
