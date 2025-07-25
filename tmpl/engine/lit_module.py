@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 import lightning as L
 import torch.nn as nn
 import torch.optim as optim
@@ -46,39 +48,46 @@ class LitModule(L.LightningModule):
     def validation_step(self, batch, batch_idx):
         self._step(batch, self.evaluator)
         if self.evaluator:
-            self.log(f'val/acc', self.evaluator, sync_dist=True)
+            self.log(f'val/{self.evaluator.__class__.__name__}',
+                     self.evaluator, sync_dist=True)
 
     def test_step(self, batch, batch_idx):
         self._step(batch, self.evaluator)
         if self.evaluator:
-            self.log(f'test/acc', self.evaluator, sync_dist=True)
+            self.log(f'test/{self.evaluator.__class__.__name__}',
+                     self.evaluator, sync_dist=True)
 
     def configure_optimizers(self):
         optimizer_cfg = self.optimizer
         with open_dict(optimizer_cfg):
             paramwise_cfg = optimizer_cfg.pop('paramwise_cfg', None)
-        if paramwise_cfg:
-            params = []
-            pgs = [[] for _ in paramwise_cfg]
+        pg0 = []
+        pgs = defaultdict(list)
 
-            for k, v in self.named_parameters():
-                in_param_group = False
-                for i, pg_cfg in enumerate(paramwise_cfg):
-                    if 'name' in pg_cfg and pg_cfg.name in k:
-                        pgs[i].append(v)
-                        in_param_group = True
-                        break
-                if not in_param_group:
-                    params.append(v)
-        else:
-            params = self.model.parameters()
-        optimizer = build_from_configs(optim, optimizer_cfg, params=params)
         if paramwise_cfg:
-            for pg, pg_cfg in zip(pgs, paramwise_cfg):
+            for pg_cfg in paramwise_cfg:
+                pgs[pg_cfg.name].append(pg_cfg)
+
+            for name, param in self.named_parameters():
+                matched = False
+                for pg_cfg in paramwise_cfg:
+                    if 'name' in pg_cfg and pg_cfg.name in name:
+                        pgs[pg_cfg.name].append(param)
+                        matched = True
+                        break
+                if not matched:
+                    pg0.append(param)
+        else:
+            pg0 = self.model.parameters()
+
+        optimizer = build_from_configs(optim, optimizer_cfg, params=pg0)
+        if paramwise_cfg:
+            for pg in pgs.values():
+                pg_cfg, *params = pg
                 cfg = {}
                 if 'lr_mult' in pg_cfg:
                     cfg['lr'] = optimizer_cfg.lr * pg_cfg.lr_mult
-                optimizer.add_param_group({'params': pg, **cfg})
+                optimizer.add_param_group({'params': params, **cfg})
 
         scheduler = build_from_configs(
             optim.lr_scheduler, self.scheduler, optimizer=optimizer)

@@ -1,3 +1,4 @@
+import logging
 import os
 import os.path as osp
 
@@ -5,6 +6,8 @@ import torch
 import torch.utils.data as data
 import torchvision.transforms as T
 from PIL import Image
+
+logger = logging.getLogger(__name__)
 
 
 class ImageTextPairsDataset(data.Dataset):
@@ -39,7 +42,7 @@ class ImageTextPairsDataset(data.Dataset):
                     osp.join(image_root, img_path),
                     sum([1 * (c + 1) if c in label else 0 for c in range(num_classes)])
                 ])
-        print(f'Loaded {len(self.data)} images in the {mode} split.')
+        logger.info(f'Loaded {len(self.data)} images in the {mode} split')
 
     def __len__(self):
         return len(self.data)

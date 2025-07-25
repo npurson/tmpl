@@ -15,9 +15,9 @@ def build_data_loaders(cfg: DictConfig):
 
     if cfg.datasets.type in ('CIFAR10', 'MNIST'):
         print(
-            f'NOTE: For demonstration using standard torchvision.datasets like {cfg.datasets.type}, '
-            'we are manually adding ToTensor() here to ensure the pipeline is runnable. '
-            'In a typical use case with your own dataset, you should generally handle it elsewhere.'
+            'NOTE: For demonstration purposes, when using standard torchvision.datasets such as '
+            f'{cfg.datasets.type}, we manually add ToTensor() here to ensure the pipeline is runnable. '
+            'For typical use case with custom dataset, you should generally handle it elsewhere.'
         )
         split_cfgs = OmegaConf.to_container(split_cfgs)
         for s in split_cfgs:

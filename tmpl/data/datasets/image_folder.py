@@ -1,3 +1,4 @@
+import logging
 import os
 import os.path as osp
 
@@ -5,6 +6,8 @@ import torch
 import torch.utils.data as data
 import torchvision.transforms as T
 from PIL import Image
+
+logger = logging.getLogger(__name__)
 
 
 class ImageFolderDataset(data.Dataset):
@@ -36,7 +39,7 @@ class ImageFolderDataset(data.Dataset):
             cls_dir = osp.join(data_root, cls)
             for img in os.listdir(cls_dir):
                 self.data.append((osp.join(cls_dir, img), i))
-            print(f'{cls}: {len(os.listdir(cls_dir))}')
+            logger.info(f'{cls}: {len(os.listdir(cls_dir))}')
 
     def __len__(self):
         return len(self.data)
